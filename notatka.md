@@ -328,11 +328,11 @@ Bardziej rozbudowany przykład w pliku `benchmarking.cpp`
 
 ---
 
-## 10. C++20: kalendarz
+## 7. C++20: kalendarz
 
 Nagłówek: `<chrono>`. Typy opisują **elementy daty** — każdy ma własny typ, dzięki czemu nie pomylisz dnia z miesiącem.
 
-### 10.1. Typy
+### 7.1. Typy
 
 | Typ | Opis | Przykład |
 |---|---|---|
@@ -353,15 +353,15 @@ Stałe: `January` … `December`, `Sunday` … `Saturday`, `last`.
 
 Więcej przykładów składania dat w calendar.cpp
 
-### 10.2. Walidacja
+### 7.2. Walidacja
 
 Typy kalendarzowe mogą reprezentować wartości **niepoprawne**; sprawdź przez `ok()`:
 
-### 10.3. Konwersje: data ↔ `sys_days`
+### 7.3. Konwersje: data ↔ `sys_days`
 
 `sys_days` = `time_point<system_clock, days>` — „liczba dni od 1970-01-01”. To „pomost” do arytmetyki dni.
 
-### 10.4. Dodawanie miesięcy i lat
+### 7.4. Dodawanie miesięcy i lat
 
 Dla typów kalendarzowych `+ months` / `+ years` działa na polach, bez przechodzenia przez dni. Wynik może być **niepoprawną datą**:
 
@@ -374,7 +374,7 @@ if (!d.ok()) {
 
 (`sys_days + months` się nie skompiluje — `months` nie dzieli się bez reszty na `days`.)
 
-### 10.5. Doba: `hh_mm_ss`
+### 7.5. Doba: `hh_mm_ss`
 
 ```cpp
 using namespace std::chrono;
@@ -392,7 +392,7 @@ auto date = year_month_day{floor<days>(now)};
 auto time = hh_mm_ss{now - floor<days>(now)};
 ```
 
-### 10.6. Przykład: ostatni piątek miesiąca
+### 7.6. Przykład: ostatni piątek miesiąca
 
 ```cpp
 using namespace std::chrono;
@@ -403,11 +403,11 @@ std::cout << year_month_day{last_friday} << '\n';   // 2024-10-25
 
 ---
 
-## 11. C++20: strefy czasowe
+## 8. C++20: strefy czasowe
 
 Strefy czasowe opierają się na **bazie IANA tz database** (nazwy typu `"Europe/Warsaw"`, `"America/New_York"`). Biblioteka standardowa albo korzysta z danych systemowych, albo (zależnie od implementacji) z własnej kopii.
 
-### 11.1. Podstawy
+### 8.1. Podstawy
 
 ```cpp
 using namespace std::chrono;
@@ -427,7 +427,7 @@ auto sys   = zt.get_sys_time();                 // sys_time (UTC)
 auto local = zt.get_local_time();               // local_time (ścienny czas w strefie)
 ```
 
-### 11.2. Informacje o strefie
+### 8.2. Informacje o strefie
 
 ```cpp
 sys_info info = waw->get_info(system_clock::now());
@@ -437,7 +437,7 @@ info.abbrev;     // "CEST"
 info.begin, info.end;   // przedział obowiązywania tych ustawień
 ```
 
-### 11.3. Czas lokalny → UTC: niejednoznaczności
+### 8.3. Czas lokalny → UTC: niejednoznaczności
 
 Konwersja *czasu lokalnego* na moment w czasie bywa niejednoznaczna lub niemożliwa przez zmianę czasu:
 
@@ -462,7 +462,7 @@ zoned_time early{"Europe/Warsaw",
                  choose::earliest};   // choose::latest dla późniejszego wystąpienia
 ```
 
-### 11.4. Dobre praktyki dla stref
+### 8.4. Dobre praktyki dla stref
 
 - **Przechowuj i przesyłaj czas jako UTC** (`sys_time` / Unix time / ISO 8601 z `Z`), a strefy stosuj dopiero przy wyświetlaniu lub interakcji z użytkownikiem.
 - Do przyszłych zdarzeń „o 9:00 czasu lokalnego” zapisuj **czas lokalny + nazwę strefy**, nie UTC (reguły DST mogą się zmienić).
@@ -471,9 +471,9 @@ zoned_time early{"Europe/Warsaw",
 
 ---
 
-## 12. Formatowanie i parsowanie (C++20)
+## 9. Formatowanie i parsowanie (C++20)
 
-### 12.1. Wypisywanie
+### 9.1. Wypisywanie
 
 Typy chrono mają `operator<<` oraz specjalizację `std::formatter`:
 
@@ -516,7 +516,7 @@ Często używane specyfikatory (jak w `strftime`, z rozszerzeniami):
 | `%a` / `%A` | dzień tygodnia (skrót/pełny) | `%z` | przesunięcie `+hhmm` |
 | `%b` / `%B` | miesiąc (skrót/pełny) | `%Q` / `%q` | liczba tików / jednostka (dla `duration`) |
 
-### 12.2. Parsowanie
+### 9.2. Parsowanie
 
 ```cpp
 #include <sstream>
