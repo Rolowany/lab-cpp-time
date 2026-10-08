@@ -1,2 +1,1 @@
-# lab-cpp-time
-# lab-cpp-time
+# Laboratorium na temat czasu w C++
