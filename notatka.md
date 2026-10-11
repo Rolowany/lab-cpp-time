@@ -70,7 +70,9 @@ class duration;
 - `Period` — `std::ratio` mówiący, ile sekund trwa jeden tik.
   
 `std::ratio<Num, Den>` to ułamek wymierny znany w czasie kompilacji.
-Zamiast ręcznie definiować Period można użyć std::micro, std::nano, std::kilo, std::mega, ... 
+Zamiast ręcznie definiować Period można użyć std::micro, std::nano, std::kilo, std::mega, ...
+Ułamki są automatycznie skracane i obsługują arytmetykę w czasie kompilacji (`std::ratio_add`, `std::ratio_multiply`, …).
+Przykłady jak działa std::ratio w pliku `ratio.cpp`.
 
 ```cpp
 std::chrono::duration<int>                     a{5};   // 5 s
@@ -95,6 +97,16 @@ std::chrono::duration<long long, std::ratio<60>> c{3}; // 3 min
 
 > `months` i `years` to **średnie** długości (rok gregoriański), więc nadają się do arytmetyki kalendarzowej na typach `year_month_day`, ale nie do „dokładnych” obliczeń na sekundach.
 
+```cpp
+using namespace std::chrono;
+
+seconds s(90);
+minutes m = duration_cast<minutes>(s);
+
+days d(10);
+weeks w(2);
+```
+
 ### 3.3. Literały (C++14)
 
 ```cpp
@@ -110,7 +122,7 @@ Dostępne sufiksy: `h`, `min`, `s`, `ms`, `us`, `ns`. W C++20 dodatkowo `d` (**d
 
 ### 3.4. Konwersje
 
-**Niejawne** — tylko gdy bez straty informacji (z grubszej jednostki na drobniejszą lub gdy docelowy `rep` jest zmiennoprzecinkowy):
+**Niejawne** — tylko gdy bez straty informacji w przeciwnym wypadku błąd.
 
 ```cpp
 std::chrono::milliseconds ms = 2s;             // OK: 2000 ms
@@ -157,6 +169,8 @@ std::chrono::abs(-5s);           // C++17: 5 s
 ```
 
 Przy działaniach na różnych jednostkach wynik ma `std::common_type` obu argumentów (np. `1h + 30min` → `minutes`, `1s + 1ms` → `milliseconds`).
+Prosta łamigłówka z operacjami jest w pliku `operation_exercise.cpp` 
+
 
 ### 3.6. Typy zmiennoprzecinkowe
 
@@ -184,9 +198,6 @@ wait_for_something(std::chrono::duration<double>{0.25});
 Dla interfejsów publicznych często lepiej przyjąć konkretny typ (np. `std::chrono::milliseconds`) — wtedy wywołanie `f(2s)` zadziała dzięki konwersji niejawnej, a wywołanie `f(1500us)` nie skompiluje się (co bywa pożądane, bo ujawnia utratę dokładności).
 
 ---
-
-Ułamki są automatycznie skracane i obsługują arytmetykę w czasie kompilacji (`std::ratio_add`, `std::ratio_multiply`, …).
-Przykłady w pliku `ratio.cpp`
 
 
 ## 4. `std::chrono::time_point`
@@ -351,8 +362,6 @@ Nagłówek: `<chrono>`. Typy opisują **elementy daty** — każdy ma własny ty
 
 Stałe: `January` … `December`, `Sunday` … `Saturday`, `last`.
 
-Więcej przykładów składania dat w calendar.cpp
-
 ### 7.2. Walidacja
 
 Typy kalendarzowe mogą reprezentować wartości **niepoprawne**; sprawdź przez `ok()`:
@@ -360,6 +369,8 @@ Typy kalendarzowe mogą reprezentować wartości **niepoprawne**; sprawdź przez
 ### 7.3. Konwersje: data ↔ `sys_days`
 
 `sys_days` = `time_point<system_clock, days>` — „liczba dni od 1970-01-01”. To „pomost” do arytmetyki dni.
+
+Składanie dat i liczeni dni pomiędzy datami pokazane jest w pliku `calendar.cpp`
 
 ### 7.4. Dodawanie miesięcy i lat
 
@@ -372,40 +383,9 @@ if (!d.ok()) {
 }
 ```
 
-(`sys_days + months` się nie skompiluje — `months` nie dzieli się bez reszty na `days`.)
-
-### 7.5. Doba: `hh_mm_ss`
-
-```cpp
-using namespace std::chrono;
-
-hh_mm_ss t{14h + 30min + 5s + 250ms};
-t.hours();          // 14h
-t.minutes();        // 30min
-t.seconds();        // 5s
-t.subseconds();     // 250ms
-t.to_duration();    // z powrotem w duration
-
-// rozbicie time_point na datę i godzinę
-auto now  = floor<seconds>(system_clock::now());
-auto date = year_month_day{floor<days>(now)};
-auto time = hh_mm_ss{now - floor<days>(now)};
-```
-
-### 7.6. Przykład: ostatni piątek miesiąca
-
-```cpp
-using namespace std::chrono;
-
-sys_days last_friday = sys_days{2024y/October/Friday[last]};
-std::cout << year_month_day{last_friday} << '\n';   // 2024-10-25
-```
-
 ---
 
 ## 8. C++20: strefy czasowe
-
-Strefy czasowe opierają się na **bazie IANA tz database** (nazwy typu `"Europe/Warsaw"`, `"America/New_York"`). Biblioteka standardowa albo korzysta z danych systemowych, albo (zależnie od implementacji) z własnej kopii.
 
 ### 8.1. Podstawy
 
